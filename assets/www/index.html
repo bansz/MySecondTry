@@ -41,10 +41,17 @@
             </div>
         </div>
         <div class="cnt">
+            <b id="statText">[state]</b>
             <input id="txtSzoveg" type="text" />
-            <button id="btnSzoveg" onclick="app.textButtonClicked()">Mutasd!</button>
-            <button id="btnSzoveg2" onclick="navigator.notification.alert('bizonyhiba', null, 'üzenet', 'saját gomb?')">hiba</button>
-            <p id="deviceProperties">Loading device properties...</p>
+            <button id="btnSzoveg" onclick="app.textButtonClicked()">infó</button>
+            <button id="btnHiba" onclick="app.showMessage()">üzenet</button>
+            <button id="Button1" onclick="app.showChoise()">választás</button>
+            <button id="btnFoto" onclick="app.getPictureURI()">fotóURI</button>
+            <button id="Button2" onclick="app.getPictureString()">fotóData</button>
+            <button id="btngps" onclick="app.getGPSdata()">gps</button>
+            <button id="btncompass" onclick="app.getNavigatorData()">compass</button>
+            <p id="deviceProperties"></p>
+            <img id="myImage" width="200" height="200" />
         </div>
     </body>
 </html>

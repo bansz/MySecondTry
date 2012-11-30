@@ -17,18 +17,12 @@
 * under the License.
 */
 var app = {
+
     // Application Constructor
     initialize: function () {
-        this.bindEvents();
-    },
-    // Bind Event Listeners
-    //
-    // Bind any events that are required on startup. Common events are:
-    // `load`, `deviceready`, `offline`, and `online`.
-    bindEvents: function () {
         document.addEventListener('deviceready', this.onDeviceReady, false);
-        navigator.compass.getCurrentHeading(onSuccess, onError);
     },
+
     // deviceready Event Handler
     //
     // The scope of `this` is the event. In order to call the `receivedEvent`
@@ -36,8 +30,8 @@ var app = {
     onDeviceReady: function () {
         app.receivedEvent('deviceready');
         document.addEventListener("volumeupbutton", app.onVolumeUpKeyDown, false);
-        app.textButtonClicked();
     },
+
     // Update DOM on a Received Event
     receivedEvent: function (id) {
         var parentElement = document.getElementById(id);
@@ -50,12 +44,23 @@ var app = {
         console.log('Received Event: ' + id);
     },
 
-    textButtonClicked: function () {
 
-        navigator.notification.alert('Szöveg: ' + document.getElementById('txtSzoveg').textContent, app.alertCallback, 'Jó hír', 'Rendicsek');
+
+    getNavigatorData: function () {
+        this.setStateText('get navigator data...');
+        navigator.compass.getCurrentHeading(this.onNavigateSuccess, this.onError);
+    },
+    onNavigateSuccess: function (heading) {
+        this.setStateText('navigator data recieved');
+        navigator.notification.alert('Heading: ' + heading.magneticHeading);
+    },
+
+
+
+    textButtonClicked: function () {
+        this.setStateText('textbox text: ' + document.getElementById('txtSzoveg').value);
 
         var element = document.getElementById('deviceProperties');
-
         element.innerHTML = 'Device Name: ' + device.name + '<br />' +
                             'Device Cordova: ' + device.cordova + '<br />' +
                             'Device Platform: ' + device.platform + '<br />' +
@@ -63,20 +68,92 @@ var app = {
                             'Device Version: ' + device.version + '<br />';
     },
 
+
+
     onVolumeUpKeyDown: function () {
         navigator.notification.alert('halkító gomb megnyomva', null);
     },
 
-    alertCallback: function () {
-        var element = document.getElementById('btnSzoveg');
-        element.textContent = 'nyugtázva';
+
+
+
+
+    getPictureURI: function () {
+        //this.setStateText('get image...');
+        navigator.camera.getPicture(this.onPhotoURISuccess, this.onError,
+        {
+            quality: 50,
+            destinationType: Camera.DestinationType.FILE_URI
+        });
+    },
+    onPhotoURISuccess: function (imageURI) {
+        //this.setStateText('image recieved');
+        var image = document.getElementById('myImage');
+        image.src = imageURI;
     },
 
-    onSuccess: function (heading) {
-        navigator.notification.alert('Heading: ' + heading.magneticHeading, null);
+    getPictureString: function () {
+        //this.setStateText('get image...');
+        navigator.camera.getPicture(this.onPhotoStringSuccess, this.onError,
+        {
+            quality: 10,
+            destinationType: Camera.DestinationType.DATA_URL
+        });
     },
+    onPhotoStringSuccess: function (imageData) {
+        //this.setStateText('image recieved');
+        var image = document.getElementById('myImage');
+        image.src = "data:image/jpeg;base64," + imageData; ;
+    },
+
+
+
+    getGPSdata: function () {
+        navigator.geolocation.getCurrentPosition(this.onGPSSuccess, this.onError);
+    },
+    onGPSSuccess: function (position) {
+        navigator.notification.alert('Latitude: ' + position.coords.latitude + '\n' +
+          'Longitude: ' + position.coords.longitude + '\n' +
+          'Altitude: ' + position.coords.altitude + '\n' +
+          'Accuracy: ' + position.coords.accuracy + '\n' +
+          'Altitude Accuracy: ' + position.coords.altitudeAccuracy + '\n' +
+          'Heading: ' + position.coords.heading + '\n' +
+          'Speed: ' + position.coords.speed + '\n' +
+          'Timestamp: ' + position.timestamp + '\n');
+    },
+
+
+    showMessage: function () {
+        navigator.notification.alert('üzenet címe', this.onMessageConfirm, 'üzenet', 'saját szövegû gomb');
+    },
+    onMessageConfirm: function () {
+        this.setStateText('message confirmed');
+    },
+
+
+    showChoise: function () {
+        navigator.notification.confirm(
+            'Vajon itt egy kérdés lesz?',  // message
+            this.onChoiseConfirm,              // callback to invoke with index of button pressed
+            'A Választás',            // title
+            'elsõ,második,harmadik'          // buttonLabels
+        );
+    },
+    onChoiseConfirm: function (buttonIndex) {
+        //this.setStateText('button index: ' + buttonIndex);
+        navigator.notification.alert('button index: ' + buttonIndex);
+    },
+
+
+
+
 
     onError: function (error) {
-        navigator.notification.alert('CompassError: ' + error.code, null);
+        //this.setStateText('error occured');
+        navigator.notification.alert('code: ' + error.code + '\n' + 'message: ' + error.message + '\n');
+    },
+
+    setStateText: function (message) {
+        document.getElementById('statText').innerHTML = message;
     }
 };
